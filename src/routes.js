@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import Timetracker from './Timetracker';
-import EntryCreation from './Timetracker/EntryCreation'
+import EntryCreation from './Timetracker/EntryCreation';
 
 const Routes = () => (
   <Router>
