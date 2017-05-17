@@ -10,23 +10,34 @@ import {
 import DatePicker from 'material-ui/DatePicker';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import { graphql } from 'react-apollo';
 
-import workEntries from './workEntries';
+import query from '../../queries/getWorkEntries';
 
 class List extends Component {
-  renderWorkEntries() {
-    return workEntries.map(({ id, client, project, workedHours }) => {
+  renderWorkEntries(workEntries) {
+    return workEntries.map(({ id, client, project, worked_hours }) => {
       return (
         <TableRow key={ id }>
           <TableRowColumn>{ client }</TableRowColumn>
           <TableRowColumn>{ project }</TableRowColumn>
-          <TableRowColumn>{ workedHours }</TableRowColumn>
+          <TableRowColumn>{ worked_hours }</TableRowColumn>
         </TableRow>
       );
     });
   }
 
   render() {
+    const { loading, error, data } = this.props;
+
+    if (error) {
+      return <div>Error: { error }</div>;
+    }
+
+    if (loading || !data.work_entries) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div>
         <DatePicker hintText="Select date" autoOk={ true } />
@@ -42,7 +53,7 @@ class List extends Component {
             </TableRow>
           </TableHeader>
           <TableBody displayRowCheckbox={ false }>
-            { this.renderWorkEntries() }
+            { this.renderWorkEntries(data.work_entries) }
           </TableBody>
         </Table>
 
@@ -56,4 +67,4 @@ class List extends Component {
   }
 }
 
-export default List;
+export default graphql(query)(List);
