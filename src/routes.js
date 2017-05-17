@@ -1,13 +1,14 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { browserHistory } from 'react-router';
 
-import TimetrackerList from './Timetracker/List';
+import App from './App';
 
 const Routes = () => (
-  <Router>
-    <div>
-      <Route path="/timetracker" component={ TimetrackerList } />
-    </div>
+  <Router history={ browserHistory }>
+    <Switch>
+      <Route exact path="/" component={ App } />
+    </Switch>
   </Router>
 );
 
