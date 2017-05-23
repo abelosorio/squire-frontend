@@ -1,23 +1,19 @@
 import React, { Component } from 'react';
 import { List, ListItem, Divider } from 'material-ui';
-import { grey800 } from 'material-ui/styles/colors';
+import { graphql } from 'react-apollo';
+import Spinner from 'react-spinner-material';
+
+import query from '../../queries/getWorkEntries';
 
 class DailyView extends Component {
-  renderEntries() {
-    const fakeEntries = [
-      { id: 1, client: 'Client 1', project: 'Project 1', workedHours: '2hs' },
-      { id: 2, client: 'Client 1', project: 'Project 2', workedHours: '2hs' },
-      { id: 3, client: 'Client 2', project: 'Project A', workedHours: '2hs' },
-      { id: 4, client: 'Client 2', project: 'Project B', workedHours: '2hs' }
-    ];
-
-    return fakeEntries.map(({ id, client, project, workedHours }) => ((
+  renderEntries(workEntries) {
+    return workEntries.map(({ id, client, project, worked_hours: workedHours }) => ((
       <div key={ id }>
         <ListItem
           primaryText={
             <div style={{ display: 'flex', justifyContent: 'space-between' }} >
               <span>{ client }</span>
-              <span>{ workedHours }</span>
+              <span>{ workedHours } hs</span>
             </div>
           }
           secondaryText={ project }
@@ -28,12 +24,22 @@ class DailyView extends Component {
   }
 
   render() {
+    const { loading, error, work_entries: workEntries } = this.props.data;
+
+    if (loading || !workEntries) {
+      return <Spinner spinnerColor={ '#333' } show={ true }/>;
+    }
+
+    if (error) {
+      return <div>{ error }</div>;
+    }
+
     return (
       <div>
         <h2>Entries of May, 20</h2>
         <div>
           <List>
-            { this.renderEntries() }
+            { this.renderEntries(workEntries) }
           </List>
         </div>
       </div>
@@ -41,4 +47,4 @@ class DailyView extends Component {
   }
 }
 
-export default DailyView;
+export default graphql(query)(DailyView);
