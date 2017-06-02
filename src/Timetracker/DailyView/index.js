@@ -5,14 +5,13 @@ import {
   TableHeader,
   TableHeaderColumn,
   TableRow,
-  TableRowColumn,
-  IconButton
+  TableRowColumn
 } from 'material-ui';
 import { graphql } from 'react-apollo';
 import Spinner from 'react-spinner-material';
-import ActionDelete from 'material-ui/svg-icons/action/delete';
 
 import EntryCreationForm from './EntryCreationForm';
+import EntryDeletionButton from './EntryDeletionButton';
 import query from '../../queries/getWorkEntries';
 
 class DailyView extends Component {
@@ -29,12 +28,7 @@ class DailyView extends Component {
           <TableRowColumn>{ project }</TableRowColumn>
           <TableRowColumn>{ workedHours }</TableRowColumn>
           <TableRowColumn style={ { overflow: 'visible' } }>
-            <IconButton
-              tooltip="Delete"
-              tooltipPosition={ isLastRow ? 'top-center' : 'bottom-center' }
-            >
-              <ActionDelete />
-            </IconButton>
+            <EntryDeletionButton isLastRow={ isLastRow } entryId={ id } />
           </TableRowColumn>
         </TableRow>
       );
