@@ -7,8 +7,19 @@ import List from './List';
 import query from '../../queries/getWorkEntries';
 
 class DailyView extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { selected: undefined };
+  }
+
+  onRowSelection(selected) {
+    this.setState({ selected: this.props.data.work_entries[selected] });
+  }
+
   render() {
     const { loading, error, work_entries: workEntries } = this.props.data;
+    const { selected } = this.state;
 
     if (loading || !workEntries) {
       return <Spinner spinnerColor={ '#333' } show={ true } />;
@@ -24,12 +35,15 @@ class DailyView extends Component {
 
         <div>
           { /* @todo Get real date */ }
-          <EntryCreationForm entryDate="2017-06-01" />
+          <EntryCreationForm entryDate="2017-06-01" selected={ selected } />
         </div>
 
         <br />
 
-        <List entries={ workEntries } />
+        <List
+          entries={ workEntries }
+          onRowSelection={ this.onRowSelection.bind(this) }
+        />
       </div>
     );
   }

@@ -21,10 +21,34 @@ class EntryCreationForm extends Component {
       client: '',
       project: '',
       workedHours: '',
-      expanded: false
+      expanded: false,
+      title: 'Add new entry'
     };
 
     this.state = this.initialState;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.selected) {
+      return;
+    }
+
+    // Load the selected work entry
+    const {
+      entry_date: entryDate,
+      client,
+      project,
+      worked_hours: workedHours
+    } = nextProps.selected;
+
+    this.setState({
+      entryDate,
+      client,
+      project,
+      workedHours,
+      expanded: true,
+      title: 'Update entry'
+    });
   }
 
   handleCardExpandChange(expanded) {
@@ -61,8 +85,12 @@ class EntryCreationForm extends Component {
       .catch(error => console.error(error));
   }
 
+  handleCancel() {
+    this.setState(this.initialState);
+  }
+
   render() {
-    const { client, project, workedHours, expanded } = this.state;
+    const { client, project, workedHours, expanded, title } = this.state;
 
     return (
       <div className="entry-creation-form">
@@ -71,7 +99,7 @@ class EntryCreationForm extends Component {
           onExpandChange={ this.handleCardExpandChange.bind(this) }
         >
           <CardHeader
-            title="Add new entry"
+            title={ title }
             actAsExpander={ true }
             showExpandableButton={ true }
           />
@@ -107,7 +135,7 @@ class EntryCreationForm extends Component {
             <FlatButton
               label="Cancel"
               secondary={ true }
-              onTouchTap={ (event) => this.setState({ expanded: false }) }
+              onTouchTap={ this.handleCancel.bind(this) }
             />
           </CardActions>
         </Card>

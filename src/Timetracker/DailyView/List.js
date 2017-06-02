@@ -33,13 +33,15 @@ class List extends Component {
   }
 
   render() {
-    if (this.props.entries.length === 0) {
+    const { entries, onRowSelection } = this.props;
+
+    if (entries.length === 0) {
       return <NoEntries />;
     }
 
     return (
       <div className="daily-view-list">
-        <Table selectable={ false }>
+        <Table onRowSelection={ onRowSelection }>
           <TableHeader displaySelectAll={ false } adjustForCheckbox={ false }>
             <TableRow>
               <TableHeaderColumn>Client</TableHeaderColumn>
@@ -48,8 +50,8 @@ class List extends Component {
               <TableHeaderColumn>Actions</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody displayRowCheckbox={ false }>
-            { this.renderEntries(this.props.entries) }
+          <TableBody displayRowCheckbox={ false } showRowHover={ true }>
+            { this.renderEntries(entries) }
           </TableBody>
         </Table>
       </div>
