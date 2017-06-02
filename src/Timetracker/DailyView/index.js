@@ -57,7 +57,8 @@ class DailyView extends Component {
         <h2>Entries of May, 20</h2>
 
         <div>
-          <EntryCreationForm />
+          { /* @todo Get real date */ }
+          <EntryCreationForm entryDate="2017-06-01" />
         </div>
 
         <br />
