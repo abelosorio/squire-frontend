@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import {
   Card,
   CardActions,
@@ -9,7 +9,8 @@ import {
   FlatButton
 } from 'material-ui';
 
-import mutation from '../../mutations/createWorkEntry';
+import createWorkEntry from '../../mutations/createWorkEntry';
+import updateWorkEntry from '../../mutations/updateWorkEntry';
 import query from '../../queries/getWorkEntries';
 
 class EntryCreationForm extends Component {
@@ -22,6 +23,7 @@ class EntryCreationForm extends Component {
       project: '',
       workedHours: '',
       expanded: false,
+      id: undefined,
       title: 'Add new entry'
     };
 
@@ -38,7 +40,8 @@ class EntryCreationForm extends Component {
       entry_date: entryDate,
       client,
       project,
-      worked_hours: workedHours
+      worked_hours: workedHours,
+      id
     } = nextProps.selected;
 
     this.setState({
@@ -46,6 +49,7 @@ class EntryCreationForm extends Component {
       client,
       project,
       workedHours,
+      id,
       expanded: true,
       title: 'Update entry'
     });
@@ -72,15 +76,25 @@ class EntryCreationForm extends Component {
       entryDate: entry_date,
       client,
       project,
-      workedHours: worked_hours
+      workedHours: worked_hours,
+      id
     } = this.state;
 
-    this.props.mutate({
-      variables: {
-        input: { entry_date, client, project, worked_hours }
-      },
-      refetchQueries: [{ query }]
-    })
+    let functionToCall;
+    let variables = {
+      input: { entry_date, client, project, worked_hours }
+    };
+
+    if (id) {
+      // Update work entry
+      functionToCall = this.props.updateWorkEntry;
+      variables.id = id * 1;
+    } else {
+      // Create work entry
+      functionToCall = this.props.createWorkEntry;
+    }
+
+    functionToCall({ variables, refetchQueries: [{ query }] })
       .then(() => this.setState(this.initialState))
       .catch(error => console.error(error));
   }
@@ -144,4 +158,7 @@ class EntryCreationForm extends Component {
   }
 }
 
-export default graphql(mutation)(EntryCreationForm);
+export default compose(
+  graphql(createWorkEntry, { name: 'createWorkEntry' }),
+  graphql(updateWorkEntry, { name: 'updateWorkEntry' })
+)(EntryCreationForm);
