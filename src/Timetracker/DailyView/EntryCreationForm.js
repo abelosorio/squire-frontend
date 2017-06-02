@@ -71,7 +71,7 @@ class EntryCreationForm extends Component {
           onExpandChange={ this.handleCardExpandChange.bind(this) }
         >
           <CardHeader
-            title="Create new entry"
+            title="Add new entry"
             actAsExpander={ true }
             showExpandableButton={ true }
           />
