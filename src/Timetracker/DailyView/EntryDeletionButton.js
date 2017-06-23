@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
-import { IconButton, FlatButton, Dialog } from 'material-ui';
-import ActionDelete from 'material-ui/svg-icons/action/delete';
+import { MenuItem, FlatButton, Dialog } from 'material-ui';
 import PropTypes from 'prop-types';
 
 import mutation from '../../mutations/deleteWorkEntry';
@@ -11,7 +10,7 @@ class EntryDeletionButton extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { open: false };
+    this.state = { open: props.selectedIndex !== undefined };
   }
 
   handleOpen() {
@@ -19,7 +18,7 @@ class EntryDeletionButton extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false });
+    this.props.clearSelection();
   }
 
   handleDelete() {
@@ -34,8 +33,6 @@ class EntryDeletionButton extends Component {
   }
 
   render() {
-    const { isLastRow } = this.props;
-
     const actions = [
       <FlatButton
         label="Cancel"
@@ -51,13 +48,10 @@ class EntryDeletionButton extends Component {
 
     return (
       <div className="entry-deletion-button">
-        <IconButton
-          tooltip="Delete"
-          tooltipPosition={ isLastRow ? 'top-center' : 'bottom-center' }
+        <MenuItem
+          primaryText="Delete"
           onTouchTap={ this.handleOpen.bind(this) }
-        >
-          <ActionDelete />
-        </IconButton>
+        />
         <Dialog
           title="Confirm deletion"
           actions={ actions }
@@ -73,7 +67,8 @@ class EntryDeletionButton extends Component {
 
 EntryDeletionButton.propTypes = {
   mutate: PropTypes.func.isRequired,
-  entryId: PropTypes.string.isRequired
+  entryId: PropTypes.string.isRequired,
+  clearSelection: PropTypes.func.isRequired
 };
 
 export default graphql(mutation)(EntryDeletionButton);

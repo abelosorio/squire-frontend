@@ -6,7 +6,8 @@ import {
   CardHeader,
   CardText,
   TextField,
-  FlatButton
+  FlatButton,
+  Snackbar
 } from 'material-ui';
 
 import createWorkEntry from '../../mutations/createWorkEntry';
@@ -22,12 +23,16 @@ class EntryCreationForm extends Component {
       client: '',
       project: '',
       workedHours: '',
-      expanded: false,
+      expanded: props.selectedIndex !== undefined,
       id: undefined,
       title: 'Add new entry'
     };
 
-    this.state = this.initialState;
+    this.state = {
+      showSnackbar: false,
+      snackbarMessage: undefined,
+      ...this.initialState
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -57,6 +62,10 @@ class EntryCreationForm extends Component {
 
   handleCardExpandChange(expanded) {
     this.setState({ expanded });
+    if (!expanded) {
+      // Clear selected entry
+      this.handleCancel();
+    }
   }
 
   handleClientChange(event, client) {
@@ -84,27 +93,52 @@ class EntryCreationForm extends Component {
     let variables = {
       input: { entry_date, client, project, worked_hours }
     };
+    let snackbarMessage;
 
     if (id) {
       // Update work entry
       functionToCall = this.props.updateWorkEntry;
       variables.id = id * 1;
+
+      snackbarMessage = 'Entry updated successfuly';
     } else {
       // Create work entry
       functionToCall = this.props.createWorkEntry;
+
+      snackbarMessage = 'Entry created successfuly';
     }
 
     functionToCall({ variables, refetchQueries: [{ query }] })
-      .then(() => this.setState(this.initialState))
+      .then(() => {
+        this.setState({ showSnackbar: true, snackbarMessage });
+        this.resetForm();
+      })
       .catch(error => console.error(error));
   }
 
   handleCancel() {
+    this.resetForm();
+  }
+
+  handleRequestClose() {
+    this.setState({ showSnackbar: false });
+  }
+
+  resetForm() {
+    this.props.clearSelection();
     this.setState(this.initialState);
   }
 
   render() {
-    const { client, project, workedHours, expanded, title } = this.state;
+    const {
+      client,
+      project,
+      workedHours,
+      expanded,
+      title,
+      showSnackbar,
+      snackbarMessage
+    } = this.state;
 
     return (
       <div className="entry-creation-form">
@@ -153,6 +187,13 @@ class EntryCreationForm extends Component {
             />
           </CardActions>
         </Card>
+        <Snackbar
+          className="snackbar"
+          open={ showSnackbar }
+          message={ snackbarMessage }
+          autoHideDuration={ 4000 }
+          onRequestClose={ this.handleRequestClose.bind(this) }
+        />
       </div>
     );
   }

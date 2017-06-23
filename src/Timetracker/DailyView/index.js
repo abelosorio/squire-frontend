@@ -3,23 +3,30 @@ import { graphql } from 'react-apollo';
 import Spinner from 'react-spinner-material';
 
 import EntryCreationForm from './EntryCreationForm';
-import List from './List';
+import WorkEntriesList from './WorkEntriesList';
 import query from '../../queries/getWorkEntries';
 
 class DailyView extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { selected: undefined };
+    this.state = { selected: undefined, selectedIndex: -1 };
   }
 
-  onRowSelection(selected) {
-    this.setState({ selected: this.props.data.work_entries[selected] });
+  onItemSelection(selected) {
+    this.setState({
+      selectedIndex: selected,
+      selected: this.props.data.work_entries[selected]
+    });
+  }
+
+  clearSelection() {
+    this.setState({ selected: undefined, selectedIndex: undefined });
   }
 
   render() {
     const { loading, error, work_entries: workEntries } = this.props.data;
-    const { selected } = this.state;
+    const { selected, selectedIndex } = this.state;
 
     if (loading || !workEntries) {
       return <Spinner spinnerColor={ '#333' } show={ true } />;
@@ -34,15 +41,21 @@ class DailyView extends Component {
         <h2>Entries of May, 20</h2>
 
         <div>
-          { /* @todo Get real date */ }
-          <EntryCreationForm entryDate="2017-06-01" selected={ selected } />
+          {/* @todo Get real date */}
+          <EntryCreationForm
+            entryDate="2017-06-01"
+            selected={ selected }
+            clearSelection={ this.clearSelection.bind(this) }
+          />
         </div>
 
         <br />
 
-        <List
+        <WorkEntriesList
           entries={ workEntries }
-          onRowSelection={ this.onRowSelection.bind(this) }
+          selectedIndex={ selectedIndex }
+          onItemSelection={ this.onItemSelection.bind(this) }
+          clearSelection={ this.clearSelection.bind(this) }
         />
       </div>
     );
