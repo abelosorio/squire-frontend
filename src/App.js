@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import './App.css';
 import DailyView from './components/Timetracker/DailyView';
+import ClientManager from './components/ClientManager';
 
 class App extends Component {
   constructor(props) {
@@ -36,9 +37,13 @@ class App extends Component {
               <MenuItem onTouchTap={ this.handleClose }>
                 <Link to="/daily-view">Daily view</Link>
               </MenuItem>
+              <MenuItem>
+                <Link to="/client-manager">Clients</Link>
+              </MenuItem>
             </Drawer>
             <Grid>
               <Route path="/daily-view" component={ DailyView } />
+              <Route path="/client-manager" component={ ClientManager } />
             </Grid>
           </div>
         </MuiThemeProvider>
