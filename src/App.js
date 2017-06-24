@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -11,30 +10,16 @@ import DailyView from './components/Timetracker/DailyView';
 import ClientManager from './components/ClientManager';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { open: false };
-  }
-
-  handleToggle = () => this.setState({ open: !this.state.open });
-
-  handleClose = () => this.setState({ open: false });
-
   render() {
     return (
       <Router>
         <MuiThemeProvider>
           <div>
-            <AppBar title="Squire" onTouchTap={ this.handleToggle } />
-            <Drawer
-              open={ this.state.open }
-              docked={ false }
-              onRequestChange={ (open) => this.setState({open}) }
-            >
-              <MenuItem onTouchTap={ this.handleClose }>
-                <Link to="/">Back to home</Link>
+            <Drawer>
+              <MenuItem>
+                <Link to="/">Home</Link>
               </MenuItem>
-              <MenuItem onTouchTap={ this.handleClose }>
+              <MenuItem>
                 <Link to="/daily-view">Daily view</Link>
               </MenuItem>
               <MenuItem>
