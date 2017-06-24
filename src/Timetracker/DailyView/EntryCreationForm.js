@@ -1,71 +1,47 @@
 import React, { Component } from 'react';
-import { graphql, compose } from 'react-apollo';
 import {
   Card,
   CardActions,
   CardHeader,
   CardText,
   TextField,
-  FlatButton,
-  Snackbar
+  FlatButton
 } from 'material-ui';
-
-import createWorkEntry from '../../mutations/createWorkEntry';
-import updateWorkEntry from '../../mutations/updateWorkEntry';
-import query from '../../queries/getWorkEntries';
 
 class EntryCreationForm extends Component {
   constructor(props) {
     super(props);
 
-    this.initialState = {
-      entryDate: props.entryDate,
-      client: '',
-      project: '',
-      workedHours: '',
-      expanded: props.selectedIndex !== undefined,
-      id: undefined,
-      title: 'Add new entry'
-    };
-
     this.state = {
-      showSnackbar: false,
-      snackbarMessage: undefined,
-      ...this.initialState
+      client: undefined,
+      project: undefined,
+      workedHours: undefined,
+      expanded: props.selected !== undefined
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps.selected) {
-      return;
-    }
-
-    // Load the selected work entry
-    const {
-      entry_date: entryDate,
-      client,
-      project,
-      worked_hours: workedHours,
-      id
-    } = nextProps.selected;
+  componentWillReceiveProps({ selected }) {
+    const { client, project, worked_hours: workedHours } = selected || {};
 
     this.setState({
-      entryDate,
+      expanded: selected !== undefined,
       client,
       project,
-      workedHours,
-      id,
-      expanded: true,
-      title: 'Update entry'
+      workedHours
     });
   }
 
   handleCardExpandChange(expanded) {
     this.setState({ expanded });
-    if (!expanded) {
-      // Clear selected entry
-      this.handleCancel();
-    }
+
+    // Cancel operation when the Card is collapsed
+    if (!expanded) this.props.handleCancelOperation();
+  }
+
+  handleSaveTouchTap(event) {
+    const { client, project, workedHours, id } = this.state;
+
+    this.props.handleCreateOrUpdate({ client, project, workedHours, id });
   }
 
   handleClientChange(event, client) {
@@ -80,65 +56,9 @@ class EntryCreationForm extends Component {
     this.setState({ workedHours: workedHours * 1 });
   }
 
-  handleSaveTouchTap(event) {
-    const {
-      entryDate: entry_date,
-      client,
-      project,
-      workedHours: worked_hours,
-      id
-    } = this.state;
-
-    let functionToCall;
-    let variables = {
-      input: { entry_date, client, project, worked_hours }
-    };
-    let snackbarMessage;
-
-    if (id) {
-      // Update work entry
-      functionToCall = this.props.updateWorkEntry;
-      variables.id = id * 1;
-
-      snackbarMessage = 'Entry updated successfuly';
-    } else {
-      // Create work entry
-      functionToCall = this.props.createWorkEntry;
-
-      snackbarMessage = 'Entry created successfuly';
-    }
-
-    functionToCall({ variables, refetchQueries: [{ query }] })
-      .then(() => {
-        this.setState({ showSnackbar: true, snackbarMessage });
-        this.resetForm();
-      })
-      .catch(error => console.error(error));
-  }
-
-  handleCancel() {
-    this.resetForm();
-  }
-
-  handleRequestClose() {
-    this.setState({ showSnackbar: false });
-  }
-
-  resetForm() {
-    this.props.clearSelection();
-    this.setState(this.initialState);
-  }
-
   render() {
-    const {
-      client,
-      project,
-      workedHours,
-      expanded,
-      title,
-      showSnackbar,
-      snackbarMessage
-    } = this.state;
+    const { title } = this.props;
+    const { client, project, workedHours, expanded } = this.state;
 
     return (
       <div className="entry-creation-form">
@@ -183,23 +103,13 @@ class EntryCreationForm extends Component {
             <FlatButton
               label="Cancel"
               secondary={ true }
-              onTouchTap={ this.handleCancel.bind(this) }
+              onTouchTap={ this.props.handleCancelOperation }
             />
           </CardActions>
         </Card>
-        <Snackbar
-          className="snackbar"
-          open={ showSnackbar }
-          message={ snackbarMessage }
-          autoHideDuration={ 4000 }
-          onRequestClose={ this.handleRequestClose.bind(this) }
-        />
       </div>
     );
   }
 }
 
-export default compose(
-  graphql(createWorkEntry, { name: 'createWorkEntry' }),
-  graphql(updateWorkEntry, { name: 'updateWorkEntry' })
-)(EntryCreationForm);
+export default EntryCreationForm;
