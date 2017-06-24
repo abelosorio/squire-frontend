@@ -7,8 +7,7 @@ import { Grid } from 'react-flexbox-grid';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import './App.css';
-import TimetrackerList from './Timetracker/List';
-import DailyView from './Timetracker/DailyView';
+import DailyView from './components/Timetracker/DailyView';
 
 class App extends Component {
   constructor(props) {
@@ -35,14 +34,10 @@ class App extends Component {
                 <Link to="/">Back to home</Link>
               </MenuItem>
               <MenuItem onTouchTap={ this.handleClose }>
-                <Link to="/timetracker">Timetracker</Link>
-              </MenuItem>
-              <MenuItem onTouchTap={ this.handleClose }>
                 <Link to="/daily-view">Daily view</Link>
               </MenuItem>
             </Drawer>
             <Grid>
-              <Route path="/timetracker" component={ TimetrackerList } />
               <Route path="/daily-view" component={ DailyView } />
             </Grid>
           </div>

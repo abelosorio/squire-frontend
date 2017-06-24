@@ -7,10 +7,10 @@ import EntryCreationForm from './EntryCreationForm';
 import WorkEntriesList from './WorkEntriesList';
 
 // Mutations and query
-import query from '../../queries/getWorkEntries';
-import createWorkEntry from '../../mutations/createWorkEntry';
-import updateWorkEntry from '../../mutations/updateWorkEntry';
-import deleteWorkEntry from '../../mutations/deleteWorkEntry';
+import query from '../../../queries/getWorkEntries';
+import createWorkEntry from '../../../mutations/createWorkEntry';
+import updateWorkEntry from '../../../mutations/updateWorkEntry';
+import deleteWorkEntry from '../../../mutations/deleteWorkEntry';
 
 class DailyView extends Component {
   constructor(props) {
