@@ -43,11 +43,20 @@ class DailyView extends Component {
    * @param {WorkEntry} workEntry
    */
   handleCreateOrUpdate(workEntry) {
-    const { client, project, workedHours: worked_hours } = workEntry;
+    const {
+      clientId: client_id,
+      project,
+      workedHours: worked_hours
+    } = workEntry;
     const { entryDate: entry_date, selected} = this.state;
 
     let functionToCall;
-    let variables = { input: { entry_date, client, project, worked_hours } };
+    let variables = { input: {
+      entry_date,
+      client_id: client_id * 1,
+      project,
+      worked_hours
+    } };
     let snackbarMessage;
 
     if (selected) {

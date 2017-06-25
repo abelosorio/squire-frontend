@@ -46,7 +46,7 @@ class WorkEntriesList extends Component {
         React.Children.toArray([
           <ListItem
             value={ index }
-            primaryText={ client }
+            primaryText={ client.name }
             rightIconButton={ rightIconMenu }
             secondaryText={
               <p>

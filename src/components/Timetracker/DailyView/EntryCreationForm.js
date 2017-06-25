@@ -8,12 +8,14 @@ import {
   FlatButton
 } from 'material-ui';
 
+import ClientSelect from './ClientSelect';
+
 class EntryCreationForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      client: undefined,
+      clientId: undefined,
       project: undefined,
       workedHours: undefined,
       expanded: props.selected !== undefined
@@ -21,11 +23,11 @@ class EntryCreationForm extends Component {
   }
 
   componentWillReceiveProps({ selected }) {
-    const { client, project, worked_hours: workedHours } = selected || {};
+    const { client = {}, project, worked_hours: workedHours } = selected || {};
 
     this.setState({
       expanded: selected !== undefined,
-      client,
+      clientId: client.id,
       project,
       workedHours
     });
@@ -39,13 +41,13 @@ class EntryCreationForm extends Component {
   }
 
   handleSaveTouchTap(event) {
-    const { client, project, workedHours, id } = this.state;
+    const { clientId, project, workedHours, id } = this.state;
 
-    this.props.handleCreateOrUpdate({ client, project, workedHours, id });
+    this.props.handleCreateOrUpdate({ clientId, project, workedHours, id });
   }
 
-  handleClientChange(event, client) {
-    this.setState({ client });
+  handleClientChange(event, index, clientId) {
+    this.setState({ clientId });
   }
 
   handleProjectChange(event, project) {
@@ -58,7 +60,7 @@ class EntryCreationForm extends Component {
 
   render() {
     const { title } = this.props;
-    const { client, project, workedHours, expanded } = this.state;
+    const { clientId, project, workedHours, expanded } = this.state;
 
     return (
       <div className="entry-creation-form">
@@ -72,11 +74,10 @@ class EntryCreationForm extends Component {
             showExpandableButton={ true }
           />
           <CardText expandable={ true }>
-            <TextField
-              type="text"
+            <ClientSelect
               fullWidth={ true }
               hintText="Client"
-              value={ client }
+              value={ clientId }
               onChange={ this.handleClientChange.bind(this) }
             />
             <TextField

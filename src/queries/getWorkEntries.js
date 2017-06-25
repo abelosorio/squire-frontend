@@ -5,7 +5,10 @@ export default gql`
     work_entries {
       id
       entry_date
-      client
+      client {
+        id
+        name
+      }
       project
       worked_hours
     }
