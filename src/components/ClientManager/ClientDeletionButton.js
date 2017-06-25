@@ -1,35 +1,26 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
 import { MenuItem, FlatButton, Dialog } from 'material-ui';
 import PropTypes from 'prop-types';
 
-import mutation from '../../mutations/deleteWorkEntry';
-import query from '../../queries/getWorkEntries';
-
-class EntryDeletionButton extends Component {
+class ClientDeletionButton extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { open: props.selectedIndex !== undefined };
+    this.state = { showDialog: false };
   }
 
   handleOpen() {
-    this.setState({ open: true });
+    this.setState({ showDialog: true });
   }
 
   handleClose() {
-    this.props.clearSelection();
+    this.setState({ showDialog: false });
+    this.props.handleCancelOperation();
   }
 
   handleDelete() {
-    this.handleClose();
-
-    this.props.mutate({
-      variables: {
-        id: this.props.entryId * 1 // Cast to Int
-      },
-      refetchQueries: [{ query }]
-    }).catch(error => alert(error));
+    this.setState({ showDialog: false });
+    this.props.handleDelete(this.props.clientId * 1);
   }
 
   render() {
@@ -47,7 +38,7 @@ class EntryDeletionButton extends Component {
     ];
 
     return (
-      <div className="entry-deletion-button">
+      <div className="client-deletion-button">
         <MenuItem
           primaryText="Delete"
           onTouchTap={ this.handleOpen.bind(this) }
@@ -55,20 +46,19 @@ class EntryDeletionButton extends Component {
         <Dialog
           title="Confirm deletion"
           actions={ actions }
-          open={ this.state.open }
+          open={ this.state.showDialog }
           onRequestClose={ this.handleClose.bind(this) }
         >
-          Are you sure you want to delete this entry?
+          Are you sure you want to delete this client?
         </Dialog>
       </div>
     );
   }
 }
 
-EntryDeletionButton.propTypes = {
-  mutate: PropTypes.func.isRequired,
-  entryId: PropTypes.string.isRequired,
-  clearSelection: PropTypes.func.isRequired
+ClientDeletionButton.propTypes = {
+  clientId: PropTypes.string.isRequired,
+  handleCancelOperation: PropTypes.func.isRequired
 };
 
-export default graphql(mutation)(EntryDeletionButton);
+export default ClientDeletionButton;

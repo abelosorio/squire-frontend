@@ -9,7 +9,6 @@ import {
 } from 'material-ui';
 import { grey400 } from 'material-ui/styles/colors';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import PropTypes from 'prop-types';
 
 import EntryDeletionButton from './EntryDeletionButton';
 import NoEntries from './NoEntries';
@@ -17,20 +16,13 @@ import NoEntries from './NoEntries';
 let SelectableList = makeSelectable(List);
 
 class WorkEntriesList extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      selectedIndex: undefined,
-      onItemSelection: props.onItemSelection
-    };
-  }
-
   handleRequestChange(event, index) {
-    this.state.onItemSelection(index);
+    this.props.handleItemSelection(index);
   }
 
-  renderEntries(workEntries, onItemSelection, clearSelection) {
+  renderEntries(workEntries) {
+    const { handleCancelOperation, handleDelete } = this.props;
+
     return workEntries.map((value, index) => {
       const { id, client, project, worked_hours: workedHours } = value;
 
@@ -43,7 +35,8 @@ class WorkEntriesList extends Component {
       const rightIconMenu = (
         <IconMenu iconButtonElement={ iconButtonElement }>
           <EntryDeletionButton
-            clearSelection={ clearSelection }
+            handleCancelOperation={ handleCancelOperation }
+            handleDelete={ handleDelete }
             entryId={ id }
           />
         </IconMenu>
@@ -53,7 +46,7 @@ class WorkEntriesList extends Component {
         React.Children.toArray([
           <ListItem
             value={ index }
-            primaryText={ client }
+            primaryText={ client.name }
             rightIconButton={ rightIconMenu }
             secondaryText={
               <p>
@@ -68,16 +61,9 @@ class WorkEntriesList extends Component {
   }
 
   render() {
-    const {
-      entries,
-      selectedIndex,
-      onItemSelection,
-      clearSelection
-    } = this.props;
+    const { entries, selectedIndex } = this.props;
 
-    if (entries.length === 0) {
-      return <NoEntries />;
-    }
+    if (entries.length === 0) return <NoEntries />;
 
     return (
       <div className="daily-view-list">
@@ -85,7 +71,7 @@ class WorkEntriesList extends Component {
           value={ selectedIndex }
           onChange={ this.handleRequestChange.bind(this) }
         >
-          { this.renderEntries(entries, onItemSelection, clearSelection) }
+          { this.renderEntries(entries) }
         </SelectableList>
       </div>
     );
