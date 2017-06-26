@@ -10,7 +10,7 @@ import {
 
 import ClientSelect from './ClientSelect';
 
-class EntryCreationForm extends Component {
+class WorkEntryCreationForm extends Component {
   constructor(props) {
     super(props);
 
@@ -59,7 +59,7 @@ class EntryCreationForm extends Component {
   }
 
   render() {
-    const { title } = this.props;
+    const { title, clients, loadingClients } = this.props;
     const { clientId, project, workedHours, expanded } = this.state;
 
     return (
@@ -79,6 +79,8 @@ class EntryCreationForm extends Component {
               hintText="Client"
               value={ clientId }
               onChange={ this.handleClientChange.bind(this) }
+              clients={ clients }
+              loading={ loadingClients }
             />
             <TextField
               type="text"
@@ -113,4 +115,4 @@ class EntryCreationForm extends Component {
   }
 }
 
-export default EntryCreationForm;
+export default WorkEntryCreationForm;

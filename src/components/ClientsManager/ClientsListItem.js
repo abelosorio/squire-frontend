@@ -16,7 +16,7 @@ function ClientsListItem(props) {
     <IconMenu iconButtonElement={ iconButtonElement }>
       <ClientDeletionButton
         handleCancelOperation={ props.handleCancelOperation }
-        handleDelete={ props.handleDelete }
+        handleClientDelete={ props.handleClientDelete }
         clientId={ id }
       />
     </IconMenu>

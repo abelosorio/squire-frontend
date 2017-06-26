@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
 import Spinner from 'react-spinner-material';
-import { Snackbar } from 'material-ui';
-
-import EntryCreationForm from './EntryCreationForm';
-import WorkEntriesList from './WorkEntriesList';
 
 // Mutations and query
-import query from '../../../queries/getWorkEntries';
-import createWorkEntry from '../../../mutations/createWorkEntry';
-import updateWorkEntry from '../../../mutations/updateWorkEntry';
-import deleteWorkEntry from '../../../mutations/deleteWorkEntry';
+import getWorkEntries from '../../queries/getWorkEntries';
+import getClients from '../../queries/getClients';
+import createWorkEntry from '../../mutations/createWorkEntry';
+import updateWorkEntry from '../../mutations/updateWorkEntry';
+import deleteWorkEntry from '../../mutations/deleteWorkEntry';
 
-class DailyView extends Component {
+import WorkEntriesDailyView from '../../components/WorkEntriesDailyView';
+
+class TimetrackerDaily extends Component {
   constructor(props) {
     super(props);
 
@@ -24,7 +23,7 @@ class DailyView extends Component {
       showSnackbar: false,
       snackbarMessage: '',
       // @todo
-      entryDate: '2017-06-24',
+      date: '2017-06-24',
       entryFormTitle: this.DEFAULT_ENTRY_FORM_TITLE
     };
   }
@@ -32,7 +31,7 @@ class DailyView extends Component {
   handleItemSelection(index) {
     this.setState({
       selectedIndex: index,
-      selected: this.props.data.work_entries[index],
+      selected: this.props.getWorkEntries.work_entries[index],
       entryFormTitle: 'Update work entry'
     });
   }
@@ -48,7 +47,7 @@ class DailyView extends Component {
       project,
       workedHours: worked_hours
     } = workEntry;
-    const { entryDate: entry_date, selected} = this.state;
+    const { date: entry_date, selected} = this.state;
 
     let functionToCall;
     let variables = { input: {
@@ -72,12 +71,12 @@ class DailyView extends Component {
       snackbarMessage = 'Entry created successfuly';
     }
 
-    functionToCall({ variables, refetchQueries: [{ query }] })
+    functionToCall({ variables, refetchQueries: ['getWorkEntries'] })
       .then(() => {
         this.resetForm();
         this.setState({ showSnackbar: true, snackbarMessage });
       })
-      .catch(this.handleOperationFailed);
+      .catch(this.handleOperationFailed.bind(this));
   }
 
   /**
@@ -88,14 +87,14 @@ class DailyView extends Component {
   handleDelete(entryId) {
     this.props.deleteWorkEntry({
       variables: { id: entryId },
-      refetchQueries: [{ query }]
+      refetchQueries: ['getWorkEntries']
     }).then(() => {
       this.resetForm();
       this.setState({
         showSnackbar: true,
         snackbarMessage: 'Entry delete successfuly'
       });
-    }).catch(this.handleOperationFailed);
+    }).catch(this.handleOperationFailed.bind(this));
   }
 
   handleCancelOperation() {
@@ -111,18 +110,22 @@ class DailyView extends Component {
   }
 
   handleOperationFailed(error) {
-    alert(error);
+    this.setState({
+      showSnackbar: true,
+      snackbarMessage: error.message
+    });
   }
 
   render() {
-    const { loading, error, work_entries: workEntries } = this.props.data;
+    const { loading, error, work_entries: workEntries } = this.props.getWorkEntries;
+    const { loading: loadingClients, clients } = this.props.getClients;
+
     const {
       selected,
-      selectedIndex,
       showSnackbar,
       snackbarMessage,
-      entryDate,
-      entryFormTitle
+      entryFormTitle,
+      date
     } = this.state;
 
     if (loading || !workEntries) {
@@ -134,37 +137,20 @@ class DailyView extends Component {
     }
 
     return (
-      <div className="daily-view">
-        <h2>Entries of May, 20</h2>
-
-        <div>
-          <EntryCreationForm
-            entryDate={ entryDate }
-            selected={ selected }
-            handleCancelOperation={ this.handleCancelOperation.bind(this) }
-            handleCreateOrUpdate={ this.handleCreateOrUpdate.bind(this) }
-            title={ entryFormTitle }
-          />
-        </div>
-
-        <br />
-
-        <WorkEntriesList
-          entries={ workEntries }
-          selectedIndex={ selectedIndex }
-          handleItemSelection={ this.handleItemSelection.bind(this) }
-          handleCancelOperation={ this.handleCancelOperation.bind(this) }
-          handleDelete={ this.handleDelete.bind(this) }
-        />
-
-        <Snackbar
-          className="snackbar"
-          open={ showSnackbar }
-          message={ snackbarMessage }
-          autoHideDuration={ 4000 }
-          onRequestClose={ () => this.setState({ showSnackbar: false }) }
-        />
-      </div>
+      <WorkEntriesDailyView
+        workEntries={ workEntries }
+        showSnackbar={ showSnackbar }
+        snackbarMessage={ snackbarMessage }
+        handleItemSelection={ this.handleItemSelection.bind(this) }
+        handleCreateOrUpdate={ this.handleCreateOrUpdate.bind(this) }
+        handleDelete={ this.handleDelete.bind(this) }
+        handleCancelOperation={ this.handleCancelOperation.bind(this) }
+        entryFormTitle={ entryFormTitle }
+        selected={ selected }
+        date={ date }
+        clients={ clients }
+        loadingClients={ loadingClients }
+      />
     );
   }
 }
@@ -173,5 +159,6 @@ export default compose(
   graphql(createWorkEntry, { name: 'createWorkEntry' }),
   graphql(updateWorkEntry, { name: 'updateWorkEntry' }),
   graphql(deleteWorkEntry, { name: 'deleteWorkEntry' }),
-  graphql(query)
-)(DailyView);
+  graphql(getWorkEntries, { name: 'getWorkEntries' }),
+  graphql(getClients, { name: 'getClients' })
+)(TimetrackerDaily);

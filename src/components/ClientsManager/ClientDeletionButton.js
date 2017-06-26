@@ -18,9 +18,9 @@ class ClientDeletionButton extends Component {
     this.props.handleCancelOperation();
   }
 
-  handleDelete() {
+  handleClientDelete() {
     this.setState({ showDialog: false });
-    this.props.handleDelete(this.props.clientId * 1);
+    this.props.handleClientDelete(this.props.clientId * 1);
   }
 
   render() {
@@ -33,7 +33,7 @@ class ClientDeletionButton extends Component {
       <FlatButton
         label="Confirm"
         primary={ true }
-        onTouchTap={ this.handleDelete.bind(this) }
+        onTouchTap={ this.handleClientDelete.bind(this) }
       />
     ];
 

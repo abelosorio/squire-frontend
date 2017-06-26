@@ -5,7 +5,7 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
 
 import './index.css';
-import App from './App';
+import App from './containers/App/index';
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({

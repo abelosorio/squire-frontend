@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
-import { List, FloatingActionButton, Snackbar } from 'material-ui';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import query from '../../queries/getClients';
 import createClient from '../../mutations/createClient';
 import deleteClient from '../../mutations/deleteClient';
 
-import ClientsListItem from './ClientsListItem';
-import ClientAddForm from './ClientAddForm';
+import { ClientsList, ClientAddForm } from '../../components/ClientsManager';
 
-class ClientsList extends Component {
+class ClientsManager extends Component {
   constructor(props) {
     super(props);
 
@@ -19,19 +16,6 @@ class ClientsList extends Component {
       showSnackbar: false,
       snackbarMessage: ''
     };
-  }
-
-  renderClients(clients) {
-    return clients.map(
-      client => ((
-        <ClientsListItem
-          key={ client.id }
-          client={ client }
-          handleCancelOperation={ this.handleCancelOperation.bind(this) }
-          handleDelete={ this.handleClientDelete.bind(this) }
-        />
-      ))
-    );
   }
 
   handleOnAddTouchTap() {
@@ -67,15 +51,21 @@ class ClientsList extends Component {
     this.setState({ showAddForm: false });
   }
 
+  handleRequestCloseSnackbar() {
+    this.setState({ showSnackbar: false });
+  }
+
   render() {
     const { loading, error, clients } = this.props.data;
     const { showAddForm, showSnackbar, snackbarMessage } = this.state;
 
     if (loading) {
+      // @todo: Use a custom <Loading /> element
       return <div>Loading...</div>;
     }
 
     if (error) {
+      // @todo: Use a custom error page or Component
       return <div>{ error }</div>;
     }
 
@@ -89,24 +79,15 @@ class ClientsList extends Component {
     }
 
     return (
-      <div className="clients-list">
-        <h2>Clients List</h2>
-        <List>
-          { this.renderClients(clients) }
-        </List>
-        <FloatingActionButton
-          className="floating-bottom-right-button"
-          onTouchTap={ this.handleOnAddTouchTap.bind(this) }
-        >
-          <ContentAdd />
-        </FloatingActionButton>
-        <Snackbar
-          open={ showSnackbar }
-          message={ snackbarMessage }
-          autoHideDuration={ 4000 }
-          onRequestClose={ () => this.setState({ showSnackbar: false }) }
-        />
-      </div>
+      <ClientsList
+        clients={ clients }
+        handleOnAddTouchTap={ this.handleOnAddTouchTap.bind(this) }
+        handleRequestCloseSnackbar={ this.handleRequestCloseSnackbar.bind(this) }
+        showSnackbar={ showSnackbar }
+        snackbarMessage={ snackbarMessage }
+        handleCancelOperation={ this.handleCancelOperation.bind(this) }
+        handleClientDelete={ this.handleClientDelete.bind(this) }
+      />
     );
   }
 }
@@ -115,4 +96,4 @@ export default compose(
   graphql(query),
   graphql(createClient, { name: 'createClient' }),
   graphql(deleteClient, { name: 'deleteClient' })
-)(ClientsList);
+)(ClientsManager);
