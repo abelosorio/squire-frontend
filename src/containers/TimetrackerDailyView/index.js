@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
 import Spinner from 'react-spinner-material';
+import PropTypes from 'prop-types';
 
 // Mutations and query
 import getWorkEntries from '../../queries/getWorkEntries';
@@ -154,6 +155,14 @@ class TimetrackerDaily extends Component {
     );
   }
 }
+
+TimetrackerDaily.propTypes = {
+  getWorkEntries: PropTypes.object.isRequired,
+  getClients: PropTypes.object.isRequired,
+  createWorkEntry: PropTypes.func.isRequired,
+  updateWorkEntry: PropTypes.func.isRequired,
+  deleteWorkEntry: PropTypes.func.isRequired
+};
 
 export default compose(
   graphql(createWorkEntry, { name: 'createWorkEntry' }),

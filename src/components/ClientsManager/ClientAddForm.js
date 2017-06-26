@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { TextField, RaisedButton } from 'material-ui';
+import PropTypes from 'prop-types';
 
 class ClientAddForm extends Component {
   constructor(props) {
@@ -40,5 +41,10 @@ class ClientAddForm extends Component {
     );
   }
 }
+
+ClientAddForm.propTypes = {
+  handleClientCreation: PropTypes.func.isRequired,
+  handleCancelOperation: PropTypes.func.isRequired
+};
 
 export default ClientAddForm;

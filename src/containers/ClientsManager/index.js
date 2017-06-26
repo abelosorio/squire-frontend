@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
+import PropTypes from 'prop-types';
 
 import query from '../../queries/getClients';
 import createClient from '../../mutations/createClient';
@@ -91,6 +92,12 @@ class ClientsManager extends Component {
     );
   }
 }
+
+ClientsManager.propTypes = {
+  data: PropTypes.object.isRequired,
+  createClient: PropTypes.func.isRequired,
+  deleteClient: PropTypes.func.isRequired
+};
 
 export default compose(
   graphql(query),

@@ -7,6 +7,7 @@ import {
   TextField,
   FlatButton
 } from 'material-ui';
+import PropTypes from 'prop-types';
 
 import ClientSelect from './ClientSelect';
 
@@ -40,7 +41,7 @@ class WorkEntryCreationForm extends Component {
     if (!expanded) this.props.handleCancelOperation();
   }
 
-  handleSaveTouchTap(event) {
+  handleSaveTouchTap() {
     const { clientId, project, workedHours, id } = this.state;
 
     this.props.handleCreateOrUpdate({ clientId, project, workedHours, id });
@@ -114,5 +115,14 @@ class WorkEntryCreationForm extends Component {
     );
   }
 }
+
+WorkEntryCreationForm.propTypes = {
+  selected: PropTypes.object,
+  handleCancelOperation: PropTypes.func.isRequired,
+  handleCreateOrUpdate: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  clients: PropTypes.array.isRequired,
+  loadingClients: PropTypes.bool.isRequired
+};
 
 export default WorkEntryCreationForm;

@@ -9,6 +9,7 @@ import {
 } from 'material-ui';
 import { grey400 } from 'material-ui/styles/colors';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import PropTypes from 'prop-types';
 
 import EntryDeletionButton from './EntryDeletionButton';
 import NoEntries from './NoEntries';
@@ -43,8 +44,9 @@ class WorkEntriesList extends Component {
       );
 
       return (
-        React.Children.toArray([
+        <div key={ index }>
           <ListItem
+            key={ index }
             value={ index }
             primaryText={ client.name }
             rightIconButton={ rightIconMenu }
@@ -53,9 +55,9 @@ class WorkEntriesList extends Component {
                 Project {project} -- Worked hours: {workedHours}
               </p>
             }
-          />,
+          />
           <Divider />
-        ])
+        </div>
       );
     });
   }
@@ -77,5 +79,13 @@ class WorkEntriesList extends Component {
     );
   }
 }
+
+WorkEntriesList.propTypes = {
+  handleItemSelection: PropTypes.func.isRequired,
+  handleCancelOperation: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  entries: PropTypes.array,
+  selectedIndex: PropTypes.number
+};
 
 export default WorkEntriesList;
