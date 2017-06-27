@@ -5,7 +5,7 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
 
 import './index.css';
-import App from './containers/App/index';
+import AppRoot from './modules/App/components/AppRoot';
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({
@@ -19,7 +19,7 @@ injectTapEventPlugin();
 
 ReactDOM.render(
   <ApolloProvider client={ client }>
-    <App />
+    <AppRoot />
   </ApolloProvider>,
   document.getElementById('root')
 );

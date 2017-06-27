@@ -49,7 +49,6 @@ function WorkEntriesDailyView(props) {
       />
 
       <Snackbar
-        className="snackbar"
         open={ showSnackbar }
         message={ snackbarMessage }
         autoHideDuration={ 4000 }

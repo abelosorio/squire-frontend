@@ -44,7 +44,7 @@ class WorkEntriesList extends Component {
       );
 
       return (
-        <div key={ index }>
+        React.Children.toArray([
           <ListItem
             key={ index }
             value={ index }
@@ -55,9 +55,9 @@ class WorkEntriesList extends Component {
                 Project {project} -- Worked hours: {workedHours}
               </p>
             }
-          />
+          />,
           <Divider />
-        </div>
+        ])
       );
     });
   }

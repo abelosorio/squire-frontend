@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
 import PropTypes from 'prop-types';
 
-import query from '../../queries/getClients';
-import createClient from '../../mutations/createClient';
-import deleteClient from '../../mutations/deleteClient';
+import query from '../../../queries/getClients';
+import createClient from '../../../mutations/createClient';
+import deleteClient from '../../../mutations/deleteClient';
 
-import { ClientsList, ClientAddForm } from '../../components/ClientsManager';
+import ClientsList from '../components/ClientsList';
+import ClientAddForm from '../components/ClientAddForm';
 
-class ClientsManager extends Component {
+class ClientsManagerPage extends Component {
   constructor(props) {
     super(props);
 
@@ -45,7 +46,10 @@ class ClientsManager extends Component {
   }
 
   handleOperationError(error) {
-    alert(error);
+    this.setState({
+      showSnackbar: true,
+      snackbarMessage: error.message
+    });
   }
 
   handleCancelOperation() {
@@ -93,7 +97,7 @@ class ClientsManager extends Component {
   }
 }
 
-ClientsManager.propTypes = {
+ClientsManagerPage.propTypes = {
   data: PropTypes.object.isRequired,
   createClient: PropTypes.func.isRequired,
   deleteClient: PropTypes.func.isRequired
@@ -103,4 +107,4 @@ export default compose(
   graphql(query),
   graphql(createClient, { name: 'createClient' }),
   graphql(deleteClient, { name: 'deleteClient' })
-)(ClientsManager);
+)(ClientsManagerPage);

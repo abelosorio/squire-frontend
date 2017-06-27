@@ -4,15 +4,15 @@ import Spinner from 'react-spinner-material';
 import PropTypes from 'prop-types';
 
 // Mutations and query
-import getWorkEntries from '../../queries/getWorkEntries';
-import getClients from '../../queries/getClients';
-import createWorkEntry from '../../mutations/createWorkEntry';
-import updateWorkEntry from '../../mutations/updateWorkEntry';
-import deleteWorkEntry from '../../mutations/deleteWorkEntry';
+import getWorkEntries from '../../../queries/getWorkEntries';
+import getClients from '../../../queries/getClients';
+import createWorkEntry from '../../../mutations/createWorkEntry';
+import updateWorkEntry from '../../../mutations/updateWorkEntry';
+import deleteWorkEntry from '../../../mutations/deleteWorkEntry';
 
-import WorkEntriesDailyView from '../../components/WorkEntriesDailyView';
+import WorkEntriesDailyView from '../components/WorkEntriesDailyView';
 
-class TimetrackerDaily extends Component {
+class DailyViewPage extends Component {
   constructor(props) {
     super(props);
 
@@ -156,7 +156,7 @@ class TimetrackerDaily extends Component {
   }
 }
 
-TimetrackerDaily.propTypes = {
+DailyViewPage.propTypes = {
   getWorkEntries: PropTypes.object.isRequired,
   getClients: PropTypes.object.isRequired,
   createWorkEntry: PropTypes.func.isRequired,
@@ -170,4 +170,4 @@ export default compose(
   graphql(deleteWorkEntry, { name: 'deleteWorkEntry' }),
   graphql(getWorkEntries, { name: 'getWorkEntries' }),
   graphql(getClients, { name: 'getClients' })
-)(TimetrackerDaily);
+)(DailyViewPage);
