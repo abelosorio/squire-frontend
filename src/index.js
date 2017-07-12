@@ -4,13 +4,12 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
-import { Provider as ReduxProvider } from 'react-redux';
 import reduxThunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 
 import './index.css';
 import AppRoot from './modules/App/components/AppRoot';
-import AppReducer from './modules/App/reducers';
+import * as reducers from './reducers';
 
 // GraphQL client
 const client = new ApolloClient({
@@ -31,7 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Redux store
 let store = createStore(
-  AppReducer,
+  combineReducers({ apollo: client.reducer(), ...reducers }),
   compose(applyMiddleware(...reduxMiddlewares))
 );
 
@@ -40,10 +39,8 @@ let store = createStore(
 injectTapEventPlugin();
 
 ReactDOM.render(
-  <ApolloProvider client={ client }>
-    <ReduxProvider store={ store }>
-      <AppRoot />
-    </ReduxProvider>
+  <ApolloProvider store={ store } client={ client }>
+    <AppRoot />
   </ApolloProvider>,
   document.getElementById('root')
 );

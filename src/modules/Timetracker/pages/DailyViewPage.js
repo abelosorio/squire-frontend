@@ -1,49 +1,47 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
 import Spinner from 'react-spinner-material';
-import PropTypes from 'prop-types';
+//import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-// Mutations and query
-// import getWorkEntries from '../../../queries/getWorkEntries';
-// import getClients from '../../../queries/getClients';
-// import createWorkEntry from '../../../mutations/createWorkEntry';
-// import updateWorkEntry from '../../../mutations/updateWorkEntry';
-// import deleteWorkEntry from '../../../mutations/deleteWorkEntry';
-
-// Reducer and Actions
-import { getWorkEntries, isFetchingWorkEntries } from '../TimetrackerReducer';
-import { fetchWorkEntries } from '../TimetrackerActions';
 
 import WorkEntriesDailyView from '../components/WorkEntriesDailyView';
 
+// Mutations and query
+import getWorkEntries from '../../../queries/getWorkEntries';
+import getClients from '../../../queries/getClients';
+import createWorkEntry from '../../../mutations/createWorkEntry';
+import updateWorkEntry from '../../../mutations/updateWorkEntry';
+import deleteWorkEntry from '../../../mutations/deleteWorkEntry';
+
+// Reducer and Actions
+import * as timetrackerSelectors from '../reducer';
+import * as timetrackerActions from '../actions';
+import * as clientsSelectors from '../../ClientManager/reducer';
+import * as clientsActions from '../../ClientManager/actions';
+
+const actions = { ...timetrackerActions, ...clientsActions };
+const selectors = { ...timetrackerSelectors, ...clientsSelectors };
+
 class DailyViewPage extends Component {
-  constructor(props) {
-    super(props);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps === this.props) return;
 
-    this.DEFAULT_ENTRY_FORM_TITLE = 'Create work entry';
+    const { work_entries: workEntries } = nextProps.getWorkEntries;
+    const { clients } = nextProps.getClients;
 
-    this.state = {
-      selected: undefined,
-      selectedIndex: -1,
-      showSnackbar: false,
-      snackbarMessage: '',
-      // @todo
-      date: '2017-06-24',
-      entryFormTitle: this.DEFAULT_ENTRY_FORM_TITLE
-    };
-  }
+    // Update store when work entries are received
+    if (workEntries !== this.props.workEntries) {
+      this.props.receiveWorkEntries(workEntries);
+    }
 
-  componentDidMount() {
-    this.props.dispatch(fetchWorkEntries());
+    // Update store when clients are received
+    if (clients !== this.props.clients) {
+      this.props.receiveClients(clients);
+    }
   }
 
   handleItemSelection(index) {
-    this.setState({
-      selectedIndex: index,
-      selected: this.props.getWorkEntries.work_entries[index],
-      entryFormTitle: 'Update work entry'
-    });
+    this.props.selectWorkEntry(this.props.workEntries[index]);
   }
 
   /**
@@ -66,26 +64,18 @@ class DailyViewPage extends Component {
       project,
       worked_hours
     } };
-    let snackbarMessage;
 
     if (selected) {
       // Update work entry
       functionToCall = this.props.updateWorkEntry;
       variables.id = selected.id * 1;
-
-      snackbarMessage = 'Entry updated successfuly';
     } else {
       // Create work entry
       functionToCall = this.props.createWorkEntry;
-
-      snackbarMessage = 'Entry created successfuly';
     }
 
     functionToCall({ variables, refetchQueries: ['getWorkEntries'] })
-      .then(() => {
-        this.resetForm();
-        this.setState({ showSnackbar: true, snackbarMessage });
-      })
+      .then(() => this.resetForm())
       .catch(this.handleOperationFailed.bind(this));
   }
 
@@ -98,66 +88,48 @@ class DailyViewPage extends Component {
     this.props.deleteWorkEntry({
       variables: { id: entryId },
       refetchQueries: ['getWorkEntries']
-    }).then(() => {
-      this.resetForm();
-      this.setState({
-        showSnackbar: true,
-        snackbarMessage: 'Entry delete successfuly'
-      });
-    }).catch(this.handleOperationFailed.bind(this));
+    }).then(() => this.resetForm())
+      .catch(this.handleOperationFailed.bind(this));
   }
 
   handleCancelOperation() {
-    this.resetForm();
-  }
-
-  resetForm() {
-    this.setState({
-      selected: undefined,
-      selectedIndex: -1,
-      entryFormTitle: this.DEFAULT_ENTRY_FORM_TITLE
-    });
+    this.props.cancelWorkEntryCreationEdition();
   }
 
   handleOperationFailed(error) {
-    this.setState({
-      showSnackbar: true,
-      snackbarMessage: error.message
-    });
+    // this.setState({
+    //   showSnackbar: true,
+    //   snackbarMessage: error.message
+    // });
   }
 
   render() {
-    console.log('PROPS -->', this.props);
-    const { isFetchingWorkEntries: loading, workEntries } = this.props;
-    // const { loading: loadingClients, clients } = this.props.getClients;
-    const { loading: loadingClients, clients } = {};
-
     const {
-      selected,
-      showSnackbar,
-      snackbarMessage,
+      isFetchingWorkEntries: loading,
+      workEntries,
+      isFetchingClients,
+      clients,
+      workEntrySelected,
       entryFormTitle,
-      date
-    } = this.state;
+      displayDate
+    } = this.props;
 
-    if (loading || !workEntries) {
+    if (loading && !workEntries) {
       return <Spinner spinnerColor={ '#333' } show={ true } />;
     }
 
     return (
       <WorkEntriesDailyView
         workEntries={ workEntries }
-        showSnackbar={ showSnackbar }
-        snackbarMessage={ snackbarMessage }
         handleItemSelection={ this.handleItemSelection.bind(this) }
         handleCreateOrUpdate={ this.handleCreateOrUpdate.bind(this) }
         handleDelete={ this.handleDelete.bind(this) }
         handleCancelOperation={ this.handleCancelOperation.bind(this) }
         entryFormTitle={ entryFormTitle }
-        selected={ selected }
-        date={ date }
+        selected={ workEntrySelected }
+        date={ displayDate }
         clients={ clients }
-        loadingClients={ loadingClients }
+        isFetchingClients={ isFetchingClients }
       />
     );
   }
@@ -165,31 +137,24 @@ class DailyViewPage extends Component {
 
 const mapStateToProps = state => {
   return {
-    workEntries: getWorkEntries(state),
-    isFetchingWorkEntries: isFetchingWorkEntries(state)
+    // Timetracker selectors
+    displayDate: selectors.displayDate(state),
+    entryFormTitle: selectors.entryFormTitle(state),
+    isFetchingWorkEntries: selectors.isFetchingWorkEntries(state),
+    workEntries: selectors.workEntries(state),
+    workEntrySelected: selectors.workEntrySelected(state),
+    // Clients selectors
+    clients: selectors.clients(state),
+    isFetchingClients: selectors.isFetchingClients(state)
   };
 };
 
-// DailyViewPage.propTypes = {
-//   getWorkEntries: PropTypes.object.isRequired,
-//   getClients: PropTypes.object.isRequired,
-//   createWorkEntry: PropTypes.func.isRequired,
-//   updateWorkEntry: PropTypes.func.isRequired,
-//   deleteWorkEntry: PropTypes.func.isRequired
-// };
-DailyViewPage.propTypes = {
-  workEntries: PropTypes.array,
-  dispatch: PropTypes.func.isRequired
-};
+const DailyViewPageWithGraphQL = compose(
+  graphql(createWorkEntry, { name: 'createWorkEntry' }),
+  graphql(updateWorkEntry, { name: 'updateWorkEntry' }),
+  graphql(deleteWorkEntry, { name: 'deleteWorkEntry' }),
+  graphql(getWorkEntries, { name: 'getWorkEntries' }),
+  graphql(getClients, { name: 'getClients' })
+)(DailyViewPage);
 
-DailyViewPage.need = [() => fetchWorkEntries()];
-
-export default connect(mapStateToProps)(DailyViewPage);
-
-// export default compose(
-//   graphql(createWorkEntry, { name: 'createWorkEntry' }),
-//   graphql(updateWorkEntry, { name: 'updateWorkEntry' }),
-//   graphql(deleteWorkEntry, { name: 'deleteWorkEntry' }),
-//   graphql(getWorkEntries, { name: 'getWorkEntries' }),
-//   graphql(getClients, { name: 'getClients' })
-// )(DailyViewPage);
+export default connect(mapStateToProps, actions)(DailyViewPageWithGraphQL);

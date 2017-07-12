@@ -60,7 +60,7 @@ class WorkEntryCreationForm extends Component {
   }
 
   render() {
-    const { title, clients, loadingClients } = this.props;
+    const { title, clients, isFetchingClients } = this.props;
     const { clientId, project, workedHours, expanded } = this.state;
 
     return (
@@ -81,7 +81,7 @@ class WorkEntryCreationForm extends Component {
               value={ clientId }
               onChange={ this.handleClientChange.bind(this) }
               clients={ clients }
-              loading={ loadingClients }
+              loading={ isFetchingClients }
             />
             <TextField
               type="text"
@@ -122,7 +122,7 @@ WorkEntryCreationForm.propTypes = {
   handleCreateOrUpdate: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   clients: PropTypes.array.isRequired,
-  loadingClients: PropTypes.bool.isRequired
+  isFetchingClients: PropTypes.bool
 };
 
 export default WorkEntryCreationForm;

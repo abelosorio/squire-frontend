@@ -65,7 +65,7 @@ class WorkEntriesList extends Component {
   render() {
     const { entries, selectedIndex } = this.props;
 
-    if (entries.length === 0) return <NoEntries />;
+    if (!entries || entries.length === 0) return <NoEntries />;
 
     return (
       <div className="daily-view-list">
