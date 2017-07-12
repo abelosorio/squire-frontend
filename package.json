@@ -16,6 +16,7 @@
     "react-scripts": "0.9.5",
     "react-spinner-material": "^1.0.12",
     "react-tap-event-plugin": "^2.0.1",
+    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
